@@ -1,0 +1,102 @@
+﻿
+> poster-store@0.1.0 build
+> next build
+
+node.exe : ΓÜá Warning: 
+Next.js inferred your 
+workspace root, but it may 
+not be correct.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (ΓÜá War  
+  ning: Ne...not be correc   
+ t.:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+ We detected multiple 
+lockfiles and selected the 
+directory of C:\Users\Sai\pac
+kage-lock.json as the root 
+directory.
+ To silence this warning, 
+set `turbopack.root` in your 
+Next.js config, or consider 
+removing one of the 
+lockfiles if it's not needed.
+   See https://nextjs.org/doc
+s/app/api-reference/config/ne
+xt-config-js/turbopack#root-d
+irectory for more 
+information.
+ Detected additional 
+lockfiles: 
+   * C:\Users\Sai\MINE\PROJEC
+TS\Clients\Poster_store\poste
+r-store\package-lock.json
+
+Γû▓ Next.js 16.1.7 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 5.2s
+  Running TypeScript ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/36) ...
+  Generating static pages using 15 workers (9/36) 
+  Generating static pages using 15 workers (18/36) 
+  Generating static pages using 15 workers (27/36) 
+Γ£ô Generating static pages using 15 workers (36/36) in 388.4ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /admin
+Γö£ Γùï /admin/custom-orders
+Γö£ Γùï /admin/customers
+Γö£ ╞Æ /admin/customers/[id]
+Γö£ Γùï /admin/delivery-charges
+Γö£ Γùï /admin/feedback
+Γö£ Γùï /admin/home
+Γö£ Γùï /admin/order-history
+Γö£ Γùï /admin/orders
+Γö£ Γùï /admin/products
+Γö£ Γùï /admin/settings
+Γö£ Γùï /admin/tracking
+Γö£ Γùï /admin/verified
+Γö£ ╞Æ /api/sendEmail
+Γö£ ╞Æ /api/sendOtp
+Γö£ ╞Æ /api/verifyOtp
+Γö£ Γùï /cart
+Γö£ Γùï /checkout
+Γö£ Γùï /contact
+Γö£ Γùï /custom
+Γö£ Γùï /design
+Γö£ ╞Æ /design/[type]
+Γö£ Γùï /design/custom
+Γö£ Γùï /faq
+Γö£ Γùï /login
+Γö£ Γùï /order-success
+Γö£ Γùï /privacy
+Γö£ ╞Æ /product/[id]
+Γö£ Γùï /profile
+Γö£ Γùï /returns
+Γö£ Γùï /shop
+Γö£ Γùï /story
+Γö£ Γùï /terms
+Γö£ Γùï /track
+Γöö Γùï /wishlist
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

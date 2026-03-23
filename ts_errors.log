@@ -1,0 +1,14 @@
+﻿src/app/(shop)/page.tsx(271,23): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/page.tsx(329,23): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/page.tsx(331,40): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/page.tsx(331,67): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/page.tsx(345,23): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/product/[id]/page.tsx(145,19): error TS18048: 'product.actualPrice' is possibly 'undefined'.
+src/app/(shop)/shop/page.tsx(84,26): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/shop/page.tsx(86,43): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/shop/page.tsx(86,70): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/(shop)/shop/page.tsx(104,27): error TS18048: 'p.actualPrice' is possibly 'undefined'.
+src/app/admin/products/page.tsx(185,22): error TS18048: 'product.actualPrice' is possibly 'undefined'.
+src/app/admin/products/page.tsx(187,40): error TS18048: 'product.actualPrice' is possibly 'undefined'.
+src/app/admin/products/page.tsx(187,79): error TS18048: 'product.actualPrice' is possibly 'undefined'.
+src/app/admin/products/page.tsx(209,45): error TS18048: 'product.actualPrice' is possibly 'undefined'.
