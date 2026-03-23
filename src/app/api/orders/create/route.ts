@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Setup basic server Supabase instance. If NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY is passed in .env, use it! Otherwise, use ANON and depend on the user's forwarded token.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Setup basic server Supabase instance. Provide safe fallback to prevent Next.js static build timeout.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://build.supabase.co';
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'build-key';
 
 const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
