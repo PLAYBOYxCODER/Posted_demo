@@ -6,6 +6,7 @@ import { CartProvider } from "@/components/CartProvider";
 import { OrderProvider } from "@/components/OrderProvider";
 import { ProductProvider } from "@/components/ProductProvider";
 import { VerifiedPhotoProvider } from "@/components/VerifiedPhotoProvider";
+import { WishlistProvider } from "@/components/WishlistProvider";
 import { OffersProvider } from "@/components/OffersProvider";
 import { AuthProvider } from "@/components/AuthProvider";
 import DynamicTitle from "@/components/DynamicTitle";
@@ -40,12 +41,14 @@ export default function RootLayout({
               <VerifiedPhotoProvider>
                 <ProductProvider>
                   <OrderProvider>
-                    <CartProvider>
-                      <DynamicTitle />
+                    <WishlistProvider>
+                      <CartProvider>
+                        <DynamicTitle />
                       <LiquidAlertProvider />
                       {children}
-                      <MobileDock />
-                    </CartProvider>
+                        <MobileDock />
+                      </CartProvider>
+                    </WishlistProvider>
                   </OrderProvider>
                 </ProductProvider>
               </VerifiedPhotoProvider>

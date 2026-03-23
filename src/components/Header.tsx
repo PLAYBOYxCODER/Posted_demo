@@ -62,7 +62,24 @@ export default function Header() {
         <div className="max-w-7xl mx-auto w-full">
           
           {/* MOBILE VIEW (< md) */}
-          <div className="flex md:hidden items-center justify-center px-4 h-24 relative">
+          <div className="flex md:hidden flex-row items-center justify-between px-4 h-20 relative w-full border-b border-white/5 bg-black/50 backdrop-blur-lg">
+            
+            <div className="flex items-center z-20">
+               {/* @ts-ignore */}
+               <StaggeredMenu
+                  position="left"
+                  items={staggeredMenuItems as any}
+                  socialItems={socialItems as any}
+                  displaySocials
+                  displayItemNumbering={false}
+                  menuButtonColor="#ffffff"
+                  openMenuButtonColor="#ffffff"
+                  changeMenuColorOnOpen={true}
+                  colors={['#18181b', '#27272a']} 
+                  accentColor="#10b981"
+                />
+            </div>
+
             {/* Center: Absolute Logo ONLY. Rest handled by MobileDock */}
             <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[72px] w-[140px] flex items-center justify-center z-10 rounded-lg">
               <div className="absolute inset-0 bg-transparent z-10" />
@@ -75,6 +92,12 @@ export default function Header() {
                 className="w-full h-full object-cover scale-[1.35] pointer-events-none"
               />
             </Link>
+            
+            <div className="flex items-center justify-end z-20 gap-4">
+               <button onClick={() => router.push('/search')} className="p-2.5 rounded-full bg-white/5 border border-white/10 text-white hover:text-emerald-400 hover:bg-white/10 transition-colors shadow-lg">
+                  <Search className="w-5 h-5" />
+               </button>
+            </div>
           </div>
 
           {/* DESKTOP / TV VIEW (md and higher) */}

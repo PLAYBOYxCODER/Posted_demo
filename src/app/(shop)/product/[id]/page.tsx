@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import { useProducts } from "@/components/ProductProvider";
 import { useOrders } from "@/components/OrderProvider";
+import { useWishlist } from "@/components/WishlistProvider";
 
 const initialMockReviews = [
   { id: 1, user: "Karan M.", rating: 5, date: "2 days ago", comment: "Absolutely insane print quality. The colors pop so heavily on my dark wall!", photo: "" },
@@ -25,7 +26,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const productImageList = product?.images?.length ? product.images : ["https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&q=80&w=1000"];
   
   const [activeImage, setActiveImage] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { wishlistIds, toggleWishlist, isInWishlist } = useWishlist();
+  const isWishlisted = product ? isInWishlist(product.id) : false;
+  
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -65,11 +68,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   };
 
   const handleToggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    if(!isWishlisted) {
-      // In real app, make API call to save to wishlist
-      // router.push('/wishlist') could be an option if they want immediate navigation, but usually it's just a toast notification
-    }
+    if (product) toggleWishlist(product.id);
   };
 
   const handleSubmitReview = (e: React.FormEvent) => {

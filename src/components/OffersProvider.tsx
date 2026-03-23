@@ -41,7 +41,7 @@ export function OffersProvider({ children }: { children: React.ReactNode }) {
   const [activeCategories, setActiveCategories] = useState<string[]>(["Marvel", "DC", "Anime", "Gaming", "Cars"]);
   const [isRazorpayEnabled, setIsRazorpayEnabled] = useState(true);
   const [isAiRecommendationsEnabled, setIsAiRecommendationsEnabled] = useState(false);
-  const initialStates = { "Andaman and Nicobar Islands": 0, "Andhra Pradesh": 0, "Arunachal Pradesh": 0, "Assam": 0, "Bihar": 0, "Chandigarh": 0, "Chhattisgarh": 0, "Dadra and Nagar Haveli": 0, "Daman and Diu": 0, "Delhi": 0, "Goa": 0, "Gujarat": 0, "Haryana": 0, "Himachal Pradesh": 0, "Jammu and Kashmir": 0, "Jharkhand": 0, "Karnataka": 0, "Kerala": 0, "Ladakh": 0, "Lakshadweep": 0, "Madhya Pradesh": 0, "Maharashtra": 0, "Manipur": 0, "Meghalaya": 0, "Mizoram": 0, "Nagaland": 0, "Odisha": 0, "Puducherry": 0, "Punjab": 0, "Rajasthan": 0, "Sikkim": 0, "Tamil Nadu": 0, "Telangana": 0, "Tripura": 0, "Uttar Pradesh": 0, "Uttarakhand": 0, "West Bengal": 0 };
+  const initialStates: Record<string, number> = {};
   const [deliveryRates, setDeliveryRates] = useState<Record<string, number>>(initialStates);
   const [whatsappNumber, setWhatsappNumber] = useState("+919876543210");
   const [featuredBentoIds, setFeaturedBentoIds] = useState<string[]>([]);

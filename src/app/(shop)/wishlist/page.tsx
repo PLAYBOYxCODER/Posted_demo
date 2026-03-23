@@ -4,26 +4,29 @@ import Link from "next/link";
 import { Heart, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-// Mock Wishlist Items
-const initialWishlist = [
-  { id: 1, name: "The Godfather Vintage", price: 699, actualPrice: 999, image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80&w=400", size: "A2 (Large)" },
-  { id: 2, name: "Iron Man Blueprint", price: 899, actualPrice: 1299, image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&q=80&w=400", size: "A3 (Medium)" },
-  { id: 3, name: "Cyberpunk Cityscape", price: 999, actualPrice: 1499, image: "https://images.unsplash.com/photo-1515239991444-a0b8d5a1b3df?auto=format&fit=crop&q=80&w=400", size: "A4 (Small)" }
-];
+import { useWishlist } from "@/components/WishlistProvider";
+import { useProducts } from "@/components/ProductProvider";
+import { useCart } from "@/components/CartProvider";
 
 export default function WishlistPage() {
   const router = useRouter();
-  const [wishlistItems, setWishlistItems] = useState(initialWishlist);
+  const { wishlistIds, toggleWishlist } = useWishlist();
+  const { products } = useProducts();
+  const { addToCart } = useCart();
 
-  const removeItem = (id: number) => {
-    setWishlistItems(wishlistItems.filter(item => item.id !== id));
-  };
-
-  const handleAddToCart = (id: number) => {
-    // In real app, push to cart state, then maybe redirect
-    // "add to the cart after they have money" - user feature request
+  const handleAddToCart = (item: any) => {
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.images[0],
+      quantity: 1,
+      size: "A4 (Small)"
+    });
     router.push('/cart');
   };
+
+  const activeWishlistItems = wishlistIds.map(id => products.find(p => p.id === id)).filter(Boolean);
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-12 md:py-20">
@@ -36,14 +39,14 @@ export default function WishlistPage() {
             <p className="text-gray-400 mt-2 uppercase tracking-widest text-sm font-semibold">Your saved favorite posters for future orders</p>
           </div>
           <p className="text-xl font-outfit font-bold uppercase mt-4 md:mt-0 bg-white/5 py-2 px-6 rounded-full border border-white/10">
-            {wishlistItems.length} {wishlistItems.length === 1 ? 'Item' : 'Items'} Saved
+            {activeWishlistItems.length} {activeWishlistItems.length === 1 ? 'Item' : 'Items'} Saved
           </p>
         </div>
 
-        {wishlistItems.length > 0 ? (
+        {activeWishlistItems.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
              <div className="lg:col-span-2 space-y-6">
-                {wishlistItems.map((item, idx) => {
+                {activeWishlistItems.map((item, idx) => {
                   const quotes = [
                     "A blank wall is a wasted opportunity.",
                     "This masterpiece is waiting for you.",
@@ -56,7 +59,7 @@ export default function WishlistPage() {
                   <div key={item.id} className="bg-zinc-900 border border-white/10 rounded-2xl p-4 flex flex-row gap-4 md:gap-6 items-center hover:border-white/30 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.5)] relative overflow-hidden group">
                      {/* Image - Strict small size for mobile */}
                      <Link href={`/product/${item.id}`} className="w-20 md:w-28 shrink-0 aspect-[3/4] bg-zinc-800 rounded-lg overflow-hidden cursor-pointer block relative">
-                        <img src={item.image} alt={item.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+                        <img src={item.images?.[0]} alt={item.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
                      </Link>
                      
                      {/* Data - Stacked content */}
@@ -66,7 +69,7 @@ export default function WishlistPage() {
                              <h3 className="font-outfit font-bold text-sm md:text-xl uppercase tracking-wider truncate">{item.name}</h3>
                            </Link>
                            <button 
-                             onClick={() => removeItem(item.id)}
+                             onClick={() => toggleWishlist(item.id)}
                              className="text-gray-500 hover:text-red-500 p-1 md:p-2 rounded-full transition-colors shrink-0"
                              title="Remove from Wishlist"
                            >
@@ -75,7 +78,7 @@ export default function WishlistPage() {
                         </div>
                         
                         <p className="text-gray-400 text-[10px] md:text-xs uppercase tracking-widest mt-0.5 mb-2 truncate">
-                           Size: <span className="text-white border px-1.5 py-0.5 rounded border-white/20 bg-black">{item.size}</span>
+                           Size: <span className="text-white border px-1.5 py-0.5 rounded border-white/20 bg-black">A4 (Small)</span>
                         </p>
                         
                         <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3">
@@ -88,7 +91,7 @@ export default function WishlistPage() {
                              &quot;{quote}&quot;
                            </p>
                            <button 
-                             onClick={() => handleAddToCart(item.id)}
+                             onClick={() => handleAddToCart(item)}
                              className="w-full sm:w-auto bg-white hover:bg-emerald-400 hover:text-black text-black px-4 md:px-6 py-2 md:py-3 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] shrink-0"
                            >
                               Add to Cart <ShoppingCart className="w-3 h-3 md:w-4 md:h-4 ml-1" />
@@ -106,12 +109,12 @@ export default function WishlistPage() {
                    Why wishful thinking?
                 </h3>
                 <p className="text-sm text-gray-400 leading-relaxed uppercase tracking-wider mb-8">
-                   You have <strong className="text-white bg-black px-2 py-1 rounded inline-block mx-1 border border-white/10">{wishlistItems.length} masterpieces</strong> sitting completely alone here. Add your favorite prints straight to the cart directly from your wishlist wall whenever you are ready!
+                   You have <strong className="text-white bg-black px-2 py-1 rounded inline-block mx-1 border border-white/10">{activeWishlistItems.length} masterpieces</strong> sitting completely alone here. Add your favorite prints straight to the cart directly from your wishlist wall whenever you are ready!
                 </p>
                 <div className="space-y-4 pt-6 border-t border-white/10">
                    <div className="flex justify-between items-center bg-black rounded-lg p-4 border border-white/5">
                       <span className="text-xs uppercase font-bold text-gray-400">Total Wishlist Value</span>
-                      <span className="font-outfit font-bold text-lg">₹{wishlistItems.reduce((acc, curr) => acc + curr.price, 0)}</span>
+                      <span className="font-outfit font-bold text-lg">₹{activeWishlistItems.reduce((acc, curr) => acc + (curr?.price||0), 0)}</span>
                    </div>
                    <button 
                      onClick={() => router.push('/cart')}

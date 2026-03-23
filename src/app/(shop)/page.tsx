@@ -139,37 +139,45 @@ export default function HomePage() {
       
       {/* Global Welcome Promotional Popup */}
       {showWelcomePopup && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-500">
-           <div className="bg-zinc-950 border border-emerald-500/30 rounded-3xl w-full max-w-lg overflow-hidden shadow-[0_0_80px_rgba(16,185,129,0.2)] relative animate-in zoom-in-95 slide-in-from-bottom-10 duration-700">
-              <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-emerald-500/20 to-transparent pointer-events-none" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-500">
+           <div className="bg-white/10 backdrop-blur-3xl border border-white/20 rounded-[32px] w-full max-w-sm md:max-w-md overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] relative animate-in zoom-in-95 slide-in-from-bottom-10 duration-700">
+              
               <button 
                 onClick={() => setShowWelcomePopup(false)}
-                className="absolute top-4 right-4 z-20 w-10 h-10 bg-black/50 hover:bg-white/10 rounded-full flex items-center justify-center text-white transition-all backdrop-blur-sm"
+                className="absolute top-4 right-4 z-20 w-8 h-8 md:w-10 md:h-10 bg-black/20 hover:bg-black/40 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-all backdrop-blur-md"
               >
-                 <X className="w-5 h-5" />
+                 <X className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               
-              <div className="h-48 overflow-hidden relative">
-                 <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover opacity-80" />
-                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent" />
-                 <div className="absolute bottom-4 left-6 flex items-center gap-2 bg-emerald-500/20 border border-emerald-500 text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md shadow-xl">
-                    <Sparkles className="w-3 h-3" /> Exclusive Unlocked
+              <div className="pt-10 pb-4 px-6 md:px-8 text-center relative z-10 flex flex-col items-center">
+                 <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-emerald-400 to-emerald-600 rounded-[22px] flex items-center justify-center mb-6 shadow-[0_10px_30px_rgba(16,185,129,0.3)] rotate-3">
+                   <ShieldCheck className="w-8 h-8 md:w-10 md:h-10 text-white" />
                  </div>
-              </div>
-              
-              <div className="p-8 pt-4 text-center relative z-10 flex flex-col items-center">
-                 <h2 className="font-outfit font-black text-4xl uppercase tracking-tighter text-white mb-2 shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
-                   Welcome to our <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">Store</span>
+                 
+                 <h2 className="font-outfit font-bold text-2xl md:text-3xl text-white mb-3 tracking-tight">
+                   Welcome to Poster Store
                  </h2>
-                 <p className="text-sm font-bold uppercase tracking-widest text-gray-400 leading-relaxed mb-8 max-w-sm">
-                   Explore the best premium posters on the market. Change your room's transformation instantly. Start browsing below.
+                 <p className="text-xs md:text-sm font-medium text-white/70 leading-relaxed mb-6">
+                   To keep your orders completely secure, we use a <strong className="text-white">passcode-free identity system</strong>. 
                  </p>
+
+                 <div className="bg-black/20 rounded-2xl p-4 mb-6 text-left w-full border border-white/5 space-y-3">
+                    <div className="flex items-start gap-3">
+                       <span className="bg-emerald-500/20 text-emerald-400 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+                       <p className="text-[11px] md:text-xs text-white/80 leading-relaxed">During checkout or login, an <strong className="text-emerald-400">OTP</strong> will be sent directly to your Email. You do not need to memorize a password.</p>
+                    </div>
+                    <div className="w-full h-[1px] bg-white/5"></div>
+                    <div className="flex items-start gap-3">
+                       <span className="bg-emerald-500/20 text-emerald-400 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+                       <p className="text-[11px] md:text-xs text-white/80 leading-relaxed">If you don't receive the OTP or prefer a quicker method, simply choose <strong className="text-emerald-400">Sign in with Google</strong>. It instantly authenticates your profile securely.</p>
+                    </div>
+                 </div>
                  
                  <button 
                    onClick={() => setShowWelcomePopup(false)}
-                   className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-widest py-4 rounded-xl text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] flex items-center justify-center gap-2"
+                   className="w-full bg-white text-black font-semibold py-3.5 md:py-4 rounded-2xl text-[13px] md:text-[15px] transition-all hover:scale-[1.02] shadow-[0_5px_20px_rgba(255,255,255,0.15)] flex items-center justify-center"
                  >
-                   <Heart className="w-4 h-4" /> Start Exploring Postings
+                   I understand, let's explore
                  </button>
               </div>
            </div>
@@ -467,8 +475,8 @@ export default function HomePage() {
       </section>
 
       {mappedBentoCards.length > 0 && (
-         <div className="max-w-[54em] mx-auto w-full my-20">
-             <div className="flex items-center gap-4 mb-8 px-6 border-b border-white/10 pb-6">
+         <div className="max-w-[54em] mx-auto w-full my-20 px-4 md:px-6">
+             <div className="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
                 <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.2)]">
                    <Sparkles className="w-6 h-6 text-emerald-400" />
                 </div>

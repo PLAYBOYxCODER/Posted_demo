@@ -1,7 +1,7 @@
 'use client';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import { Children, cloneElement, useEffect, useMemo, useRef, useState } from 'react';
-import { Search, Heart, User, Settings, ShoppingCart, Grid } from 'lucide-react';
+import { Search, Heart, User, Settings, ShoppingCart, Grid, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 // Dock Sub-Components internal logic
@@ -137,7 +137,7 @@ export default function MobileDock() {
   const router = useRouter();
   
   const items = [
-    { icon: <Search size={22} />, label: 'Search', onClick: () => router.push('/search') },
+    { icon: <Home size={22} />, label: 'Home', onClick: () => router.push('/') },
     { icon: <Grid size={22} />, label: 'Categories', onClick: () => router.push('/categories') },
     { icon: <User size={22} />, label: 'Profile', onClick: () => router.push('/profile') },
     { icon: <ShoppingCart size={22} />, label: 'Cart', onClick: () => router.push('/cart') },
