@@ -66,37 +66,37 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   const fetchOrders = async () => {
     try {
-      // Relational join with Order Items
+      // Fetch core orders natively to avoid PostgREST relationship throw
       const { data: dbOrders, error } = await supabase
         .from('orders')
-        .select(`
-          *,
-          order_items (*)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
         
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       
       if (dbOrders) {
         const formatted = dbOrders.map(o => ({
           id: o.id,
+          order_id: o.order_id || o.id,
           date: new Date(o.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
           timestamp: new Date(o.created_at).getTime(),
-          total: o.total_amount,
-          status: o.delivery_status || o.payment_status,
-          customerName: o.customer_name,
-          email: o.email,
-          phone: o.phone,
-          address: `${o.address}, ${o.city}`,
-          paymentMethod: o.payment_method,
-          items: o.order_items.map((i: any) => ({
-            id: i.product_id,
-            name: i.product_name,
-            size: i.size,
-            quantity: i.quantity,
-            price: i.price_at_purchase,
-            image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&q=80&w=200" // Mock fallback until bucket hooked
-          }))
+          total: o.total_amount || (o.product_details?.total) || 0,
+          status: o.status || o.delivery_status || o.payment_status || 'pending',
+          customerName: o.customer_name || (o.shipping_address?.full_name) || '',
+          email: o.customer_email || o.email || '',
+          phone: o.customer_phone || o.phone || '',
+          address: o.shipping_address ? `${o.shipping_address.street || ''}, ${o.shipping_address.city || ''}` : `${o.address || ''}, ${o.city || ''}`,
+          paymentMethod: o.payment_method || 'razorpay',
+          items: ((o.product_details?.items || o.order_items || []).map((i: any) => ({
+            id: i.id || i.product_id || '',
+            name: i.name || i.product_name || i.title || 'Product',
+            size: i.size || 'Standard',
+            quantity: i.quantity || 1,
+            price: i.price || i.price_at_purchase || 0,
+            image: i.image || i.image_url || "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&q=80&w=200"
+          })))
         }));
         setOrders(formatted as any);
       }

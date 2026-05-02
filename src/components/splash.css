@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+.splash-wrapper {
+  position: fixed;
+  inset: 0;
+  background: #060506; /* Deep luxury black */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.7s;
+}
+
+html.hide-splash .splash-wrapper {
+  display: none !important;
+}
+
+.splash-wrapper.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Container for perfectly centered typography */
+.splash-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+/* Beautiful Stylish Serif Title */
+.splash-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 8vmin;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  display: flex;
+  overflow: hidden;
+  text-transform: uppercase;
+  text-shadow: 0 4px 30px rgba(255, 255, 255, 0.3);
+}
+
+.splash-title .char {
+  opacity: 0;
+  transform: translateY(100%);
+  animation: letter-reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--char-index) * 0.08s);
+}
+
+/* Handle the underscore as a transparent spacer */
+.splash-title .char[data-char='_'] {
+  color: transparent;
+  width: 0.3em;
+}
+
+@keyframes letter-reveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Elegant Tagline */
+.splash-tagline {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5vmin;
+  font-weight: 300;
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  color: #a1a1aa; /* Subtle silver/gray */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: tagline-fade-in 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 1.2s; /* Wait for title to finish appearing */
+}
+
+@keyframes tagline-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Optional glowing accent line for premium feel */
+.splash-accent {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: accent-grow 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 1.0s;
+  margin-top: -1rem;
+}
+
+@keyframes accent-grow {
+  0% { width: 0; opacity: 0; }
+  100% { width: 15vw; opacity: 1; }
+}

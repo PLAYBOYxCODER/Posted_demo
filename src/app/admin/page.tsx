@@ -80,7 +80,7 @@ export default function AdminDashboardPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
       {/* STATS ROW */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <StatCard 
           title="Total Revenue (All Time)" 
           value={`₹${totalRevenue.toLocaleString()}`} 
@@ -115,20 +115,20 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* MAIN CHART */}
-        <div className="lg:col-span-2 bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-xl">
+        <div className="lg:col-span-2 bg-zinc-900 border border-white/10 rounded-2xl p-4 sm:p-6 shadow-xl overflow-hidden">
           <div className="flex justify-between items-center mb-8">
-            <div>
-              <h3 className="text-lg font-outfit font-bold uppercase tracking-widest text-white">Revenue Overview</h3>
-              <p className="text-sm text-gray-400 mt-1">Monthly sales performance</p>
+            <div className="mb-4 sm:mb-0">
+              <h3 className="text-base sm:text-lg font-outfit font-bold uppercase tracking-widest text-white">Revenue Overview</h3>
+              <p className="text-xs sm:text-sm text-gray-400 mt-0.5">Monthly sales performance</p>
             </div>
             <select className="bg-black border border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-300 outline-none focus:border-white/30">
               <option>Last 7 Months</option>
               <option>This Year</option>
             </select>
           </div>
-          <div className="h-[300px] w-full">
+          <div className="h-[200px] sm:h-[300px] w-full -ml-3 sm:-ml-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -152,7 +152,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* RECENT ORDERS COMPACT */}
-        <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col">
+        <div className="bg-zinc-900 border border-white/10 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-outfit font-bold uppercase tracking-widest text-white">Action Needed</h3>
             <button className="text-emerald-400 text-sm hover:text-emerald-300 font-medium">View All</button>
@@ -183,11 +183,11 @@ export default function AdminDashboardPage() {
 
       {/* TODAY'S ACCOUNTS ROW */}
       <h2 className="text-2xl font-outfit font-black uppercase tracking-widest text-white pt-4">Today's New Patrons <span className="text-emerald-500 ml-2">({todaysAccounts.length})</span></h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-20">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 pb-20">
          {todaysAccounts.length > 0 ? (
             todaysAccounts.map((profile, idx) => (
                <ScrollReveal key={profile.id} delay={idx * 50}>
-                  <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 flex flex-col items-center shadow-lg relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+                  <div className="bg-zinc-900 border border-white/10 rounded-2xl p-4 sm:p-6 flex flex-col items-center shadow-lg relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
                      <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 blur-[30px] rounded-full" />
                      <div className="w-16 h-16 rounded-full bg-black border-2 border-white/10 mb-4 overflow-hidden group-hover:border-emerald-500 transition-colors shadow-inner flex items-center justify-center">
                         {profile.avatar_url ? (
@@ -196,7 +196,7 @@ export default function AdminDashboardPage() {
                            <span className="text-gray-500 font-outfit font-black text-xs">NO PIC</span>
                         )}
                      </div>
-                     <h4 className="font-outfit font-black uppercase text-white truncate w-full text-center">{profile.full_name || "Unknown"}</h4>
+                     <h4 className="font-outfit font-black uppercase text-white truncate w-full text-center text-xs sm:text-base">{profile.full_name || "Unknown"}</h4>
                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.1em] mt-1 truncate w-full text-center bg-white/5 py-1 px-2 rounded-full border border-white/5">{profile.email || "No Email Bound"}</p>
                      <div className="mt-4 flex items-center gap-1 text-[9px] text-emerald-400 uppercase font-black tracking-widest bg-emerald-500/10 px-3 py-1 rounded border border-emerald-500/20">
                         <CheckCircle2 className="w-3 h-3" /> Secure OTP Login
@@ -225,8 +225,8 @@ function StatCard({ title, value, trend, isPositive, icon: Icon, color }: any) {
   };
 
   return (
-    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-white/20 transition-colors">
-      <div className="absolute top-0 right-0 p-6 opacity-20 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500">
+    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden group hover:border-white/20 transition-colors">
+      <div className="absolute top-0 right-0 p-4 sm:p-6 opacity-20 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500">
         <Icon className={`w-24 h-24 ${colorMap[color as keyof typeof colorMap].split(' ')[1]}`} />
       </div>
       <div className="relative z-10 flex flex-col h-full justify-between">
@@ -237,10 +237,13 @@ function StatCard({ title, value, trend, isPositive, icon: Icon, color }: any) {
           <h4 className="text-gray-400 font-medium text-sm">{title}</h4>
         </div>
         <div>
-          <h2 className="text-3xl font-outfit font-black mb-2">{value}</h2>
-          <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-            {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
-            {trend} <span className="text-gray-500 ml-1 font-normal">vs last month</span>
+          <h2 className="text-xl sm:text-3xl font-outfit font-black mb-1 sm:mb-2">{value}</h2>
+          <div className={`flex flex-col xl:flex-row xl:items-center gap-0.5 xl:gap-1 text-xs sm:text-sm font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+            <span className="flex items-center">
+              {isPositive ? <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4" /> : <ArrowDownRight className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {trend}
+            </span>
+            <span className="text-gray-500 xl:ml-1 font-normal text-[9px] sm:text-xs">vs last month</span>
           </div>
         </div>
       </div>

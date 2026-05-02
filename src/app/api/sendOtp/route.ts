@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_default');
 // Use powerful Service Key if available, else fallback to anon key to write OTP records
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://build.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'build-key'
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'build-key'
 );
 
 export async function POST(request: Request) {

@@ -2,9 +2,9 @@ import React from 'react';
 import './DigitalTicket.css';
 
 export default function DigitalTicket({ orderId, date, actualOrder }) {
-  const itemCount = actualOrder?.items ? actualOrder.items.reduce((acc, item) => acc + item.quantity, 0) : 1;
-  const grandTotal = actualOrder?.total || 799;
-  const itemsText = actualOrder?.items ? actualOrder.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : '1x Poster';
+  const itemCount = actualOrder?.items ? actualOrder.items.reduce((acc, item) => acc + item.quantity, 0) : 0;
+  const grandTotal = actualOrder?.total || 0;
+  const itemsText = actualOrder?.items ? actualOrder.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'Pending Items';
   
   const qrData = encodeURIComponent(`POSTER STORE RECEIPT\nOrder ID: ${orderId}\nDate: ${date}\nItems: ${itemsText}\nTotal Paid: ₹${grandTotal}\nStatus: Shipment Confirmed`);
 

@@ -6,8 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import { useProducts, ProductModel } from "@/components/ProductProvider";
 
-// Full mock data list to allow filtering
-const ALL_CATEGORIES = ["Marvel", "DC", "Cars", "Music", "TFI", "Anime", "Gaming", "Bollywood", "Tollywood", "Retro"];
+// Removed the hardcoded ALL_CATEGORIES array. It is now derived dynamically inside the component from existing products!
 
 export default function ShopPage() {
   const searchParams = useSearchParams();
@@ -18,6 +17,9 @@ export default function ShopPage() {
   const { products } = useProducts();
   const [filteredProducts, setFilteredProducts] = useState<ProductModel[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Dynamically generate unique categories from products
+  const dynamicCategories = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
 
   // Apply categories filter when query param changes or products list updates
   useEffect(() => {
@@ -144,7 +146,7 @@ export default function ShopPage() {
               <div>
                  <h3 className="font-outfit font-black uppercase mb-6 tracking-[0.2em] text-sm text-gray-400">Categories</h3>
                  <ul className="space-y-4">
-                   {ALL_CATEGORIES.map(c => {
+                   {dynamicCategories.map(c => {
                      const isActive = categoryQuery?.toLowerCase() === c.toLowerCase();
                      return (
                        <li key={c} className="flex items-center gap-3">

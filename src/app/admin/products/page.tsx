@@ -129,20 +129,6 @@ export default function ProductsPage() {
         </div>
         
         <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
-          <div className="flex bg-black border border-white/10 rounded-lg overflow-hidden p-1 shadow-md">
-             {['all', 'Active', 'Low Stock', 'Out of Stock'].map((filter) => (
-                <button 
-                  key={filter}
-                  onClick={() => setActiveTab(filter)}
-                  className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-md transition-all duration-300 ${
-                    activeTab === filter ? 'bg-white/20 text-white shadow-sm' : 'text-gray-500 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {filter}
-                </button>
-             ))}
-          </div>
-
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button 
               onClick={() => setIsManageCategoriesOpen(true)}
@@ -173,9 +159,7 @@ export default function ProductsPage() {
       <div className="pb-24">
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
            {products.map((product, index) => {
-             // For mock purposes UI, we just let them all be Active since we don't track stock heavily right now
-             const status = "Active";
-             if(activeTab !== 'all' && status !== activeTab) return null;
+             // Active filter disabled since stock is not tracked.
              
              return (
                <ScrollReveal key={product.id} delay={(index % 4) * 50}>
@@ -192,10 +176,7 @@ export default function ProductsPage() {
                     <div className="h-48 bg-black/50 relative overflow-hidden group-hover:opacity-90 transition-opacity">
                       <img src={product.images[0] || ""} alt={product.name} className="w-full h-full object-cover" />
                       
-                      {/* Status Badge overlay */}
-                      <div className="absolute top-3 left-3">
-                         <StatusBadge status={status} />
-                      </div>
+                      {/* Removed Status Badge */}
 
                       {/* Hover Actions overlay */}
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

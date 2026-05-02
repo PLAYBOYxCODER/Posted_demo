@@ -78,10 +78,10 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-12 md:py-20">
+    <div className="min-h-screen bg-black text-white px-4 md:px-6 py-8 md:py-20">
       <div className="max-w-6xl mx-auto relative">
-        <h1 className="text-3xl md:text-5xl font-outfit font-black uppercase mb-10 flex items-center gap-4">
-          <Lock className="w-8 h-8 md:w-10 md:h-10 text-emerald-500" /> Secure Checkout
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-outfit font-black uppercase mb-6 md:mb-10 flex items-center gap-3 md:gap-4">
+          <Lock className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-emerald-500" /> Secure Checkout
         </h1>
 
         {isProcessing && (
@@ -100,16 +100,16 @@ export default function CheckoutPage() {
            </div>
         )}
 
-        <form onSubmit={handlePlaceOrder} className="flex flex-col lg:flex-row gap-10">
+        <form onSubmit={handlePlaceOrder} className="flex flex-col lg:flex-row gap-8 lg:gap-10">
           {/* Checkout Details Form */}
-          <div className="flex-1 space-y-8">
+          <div className="flex-1 space-y-6 md:space-y-8">
             {/* Contact Details */}
-            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 md:p-8">
-               <h2 className="font-outfit font-bold uppercase tracking-widest mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
+            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-5 md:p-8">
+               <h2 className="font-outfit font-bold text-base md:text-lg uppercase tracking-widest mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
                   <span className="bg-white text-black w-6 h-6 flex items-center justify-center rounded-full text-xs">1</span>
                   Contact Information
                </h2>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                  <div>
                    <label className="text-xs text-gray-400 font-bold uppercase tracking-widest block mb-2">First Name</label>
                    <input name="fname" required type="text" className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Rahul" />
@@ -130,15 +130,15 @@ export default function CheckoutPage() {
             </div>
 
             {/* Shipping Address */}
-            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 md:p-8">
-               <h2 className="font-outfit font-bold uppercase tracking-widest mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
+            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-5 md:p-8">
+               <h2 className="font-outfit text-base md:text-lg font-bold uppercase tracking-widest mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
                   <span className="bg-white text-black w-6 h-6 flex items-center justify-center rounded-full text-xs">2</span>
                   Shipping Address
                </h2>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                  <div className="md:col-span-2">
                    <label className="text-xs text-gray-400 font-bold uppercase tracking-widest block mb-2">Street Address</label>
-                   <input name="address" required type="text" className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Building/Flat/Street no." />
+                   <input name="address" required type="text" className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-sm md:text-base text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Building/Flat/Street no." />
                  </div>
                  <div>
                    <label className="text-xs text-gray-400 font-bold uppercase tracking-widest block mb-2">City</label>
@@ -167,8 +167,8 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 md:p-8">
-               <h2 className="font-outfit font-bold uppercase tracking-widest mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
+            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-5 md:p-8">
+               <h2 className="font-outfit text-base md:text-lg font-bold uppercase tracking-widest mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
                   <span className="bg-white text-black w-6 h-6 flex items-center justify-center rounded-full text-xs">3</span>
                   Payment Method
                </h2>
@@ -186,11 +186,11 @@ export default function CheckoutPage() {
                  <label className={`flex items-start gap-4 border p-4 rounded-xl cursor-pointer transition-all ${selectedMethod === 'COD' ? 'border-yellow-500 bg-yellow-500/5' : 'border-white/20 hover:bg-white/5'}`}>
                    <input required type="radio" name="payment" className="w-5 h-5 accent-emerald-500 mt-1" value="COD" onChange={() => setSelectedMethod("COD")} />
                    <div className="flex flex-col flex-1">
-                     <span className="font-bold uppercase tracking-widest text-sm text-white">Cash on Delivery (+₹50 Advance)</span>
-                     <span className="text-xs text-gray-400 mt-0.5 mb-2">Pay the balance when your order arrives</span>
+                     <span className="font-bold uppercase tracking-widest text-xs sm:text-sm text-white">Cash on Delivery (+₹50 Advance)</span>
+                     <span className="text-[10px] sm:text-xs text-gray-400 mt-0.5 mb-2">Pay the balance when your order arrives</span>
                      
                      {selectedMethod === "COD" && (
-                         <div className="text-[10px] text-yellow-500 font-bold tracking-widest p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                         <div className="text-[9px] sm:text-[10px] text-yellow-500 font-bold tracking-widest p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
                             REQUIRED: A strict ₹50 advance is required now to confirm a COD order. The remaining balance (₹{grandTotal - 50}) will be collected securely at your doorstep.
                          </div>
                      )}
@@ -203,8 +203,8 @@ export default function CheckoutPage() {
 
           {/* Checkout Right Summary Panel */}
           <div className="w-full lg:w-[400px] shrink-0">
-             <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 md:p-8 sticky top-36">
-                <h3 className="font-outfit font-bold uppercase tracking-widest text-xl mb-6 border-b border-white/10 pb-4">Your Order</h3>
+             <div className="bg-zinc-900 border border-white/10 rounded-2xl p-5 md:p-8 sticky top-36">
+                <h3 className="font-outfit font-bold uppercase tracking-widest text-lg md:text-xl mb-6 border-b border-white/10 pb-4">Your Order</h3>
                 
                 {/* Dynamically Rendered Mini Cart Display */}
                 <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar mb-6 space-y-4">
@@ -236,14 +236,14 @@ export default function CheckoutPage() {
                 </div>
                 
                 <div className="flex justify-between items-center border-t border-emerald-500/30 pt-6 mb-8 bg-emerald-500/5 px-4 pb-4 -mx-4 rounded-b-xl">
-                  <span className="font-outfit font-black uppercase tracking-widest text-lg md:text-xl">Total</span>
-                  <span className="font-outfit font-black text-3xl text-emerald-400">₹{grandTotal}</span>
+                  <span className="font-outfit font-black uppercase tracking-widest text-base md:text-xl">Total</span>
+                  <span className="font-outfit font-black text-2xl md:text-3xl text-emerald-400">₹{grandTotal}</span>
                 </div>
 
                 <button 
                   type="submit"
                   disabled={isProcessing || items.length === 0}
-                  className={`w-full py-5 rounded-xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 ${(isProcessing || items.length === 0) ? 'bg-zinc-800 text-gray-500 cursor-not-allowed' : 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:-translate-y-1'}`}
+                  className={`w-full py-4 md:py-5 rounded-xl font-black uppercase tracking-[0.1em] md:tracking-[0.2em] text-xs sm:text-sm transition-all flex items-center justify-center gap-2 ${(isProcessing || items.length === 0) ? 'bg-zinc-800 text-gray-500 cursor-not-allowed' : 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:-translate-y-1'}`}
                 >
                   {isProcessing ? (
                     <span className="animate-pulse">Processing... Do Not Close</span>

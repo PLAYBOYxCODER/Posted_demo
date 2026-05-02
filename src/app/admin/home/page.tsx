@@ -1,8 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { Sparkles, Megaphone, Presentation, CalendarRange, Image as ImageIcon, Save, CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { Sparkles, Megaphone, Presentation, CalendarRange, Image as ImageIcon, Save, CheckCircle2, Plus, Trash2, Truck, Edit2 } from "lucide-react";
 import { useOffers } from "@/components/OffersProvider";
 import { useProducts } from "@/components/ProductProvider";
+import { supabase } from "@/lib/supabase";
 
 export default function OffersAdmin() {
   const { 
@@ -11,12 +12,21 @@ export default function OffersAdmin() {
     isEventActive, setIsEventActive,
     galleryItems, setGalleryItems,
     activeCategories, setActiveCategories,
+    activeCarousels, setActiveCarousels,
     isRazorpayEnabled, setIsRazorpayEnabled,
     isAiRecommendationsEnabled,
-    deliveryRates,
+    deliveryRates, setDeliveryRates,
     whatsappNumber,
     featuredBentoIds,
-    setFeaturedBentoIds
+    setFeaturedBentoIds,
+    categorySubtitles,
+    setCategorySubtitles,
+    mobileCategoryImages,
+    setMobileCategoryImages,
+    designThumbnails,
+    setDesignThumbnails,
+    upcomingDrops,
+    setUpcomingDrops
   } = useOffers();
   
   const { products } = useProducts();
@@ -27,33 +37,33 @@ export default function OffersAdmin() {
   const [localIsActive, setLocalIsActive] = useState(isEventActive);
   const [localGallery, setLocalGallery] = useState<{image: string, text: string}[]>(galleryItems);
   const [localCategories, setLocalCategories] = useState<string[]>(activeCategories);
+  const [localCarousels, setLocalCarousels] = useState<string[]>(activeCarousels || []);
+  const [localSubtitles, setLocalSubtitles] = useState<Record<string, string>>(categorySubtitles || {});
+  const [localMobileImages, setLocalMobileImages] = useState<Record<string, string>>(mobileCategoryImages || {});
   const [localRazorpay, setLocalRazorpay] = useState(isRazorpayEnabled);
+  const [localDeliveryRates, setLocalDeliveryRates] = useState<Record<string, number>>(deliveryRates || {});
   const [localFeaturedBento, setLocalFeaturedBento] = useState<string[]>(featuredBentoIds || []);
-
+  const [localDesignThumbnails, setLocalDesignThumbnails] = useState<Record<string, string>>(designThumbnails || {});
+  const [localUpcomingDrops, setLocalUpcomingDrops] = useState<{ image: string; title: string; subtitle: string }[]>(upcomingDrops || []);
   const [isSaving, setIsSaving] = useState(false);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
 
-  // Helper compression to prevent localStorage QuotaExceededError
-  const compressImage = (file: File, callback: (base64: string) => void) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 800;
-        let scaleSize = 1;
-        if (img.width > MAX_WIDTH) scaleSize = MAX_WIDTH / img.width;
-        canvas.width = img.width * scaleSize;
-        canvas.height = img.height * scaleSize;
-        const ctx = canvas.getContext("2d");
-        if (ctx) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        callback(canvas.toDataURL("image/jpeg", 0.7)); 
-      };
-      if(event.target?.result) img.src = event.target.result as string;
-    };
-    reader.readAsDataURL(file);
+  const uploadToCDN = async (file: File, folder: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${folder}/${fileName}`;
+      const { error } = await supabase.storage.from('poster_store_media').upload(filePath, file);
+      if (error) throw error;
+      const { data } = supabase.storage.from('poster_store_media').getPublicUrl(filePath);
+      return data.publicUrl;
+    } catch(err) {
+      console.error(err);
+      return null;
+    }
   };
 
-  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if(!e.target.files) return;
     const file = e.target.files[0];
     if(!file) return;
@@ -63,16 +73,21 @@ export default function OffersAdmin() {
        return;
     }
 
-    compressImage(file, (compressedBase64) => {
-      setLocalBanners(prev => [...prev, compressedBase64]);
-    });
+    setIsSaving(true);
+    const cdnUrl = await uploadToCDN(file, 'home_banners');
+    if (cdnUrl) {
+       setLocalBanners(prev => [...prev, cdnUrl]);
+    } else {
+       alert("Failed to upload Banner to CDN.");
+    }
+    setIsSaving(false);
   };
 
   const removeBanner = (indexToRemove: number) => {
     setLocalBanners(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
-  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if(!e.target.files || e.target.files.length === 0) return;
     
     const files = Array.from(e.target.files);
@@ -86,17 +101,18 @@ export default function OffersAdmin() {
     const filesToProcess = files.slice(0, remainingSlots);
     if (files.length > remainingSlots) alert(`Only room for ${remainingSlots} more. The rest were skipped.`);
     
-    filesToProcess.forEach(file => {
-      compressImage(file, (compressedBase64) => {
-        setLocalGallery(current => {
-           // Double-check to prevent exceeding 8 even in async callbacks
-           if (current.length >= 8) return current;
-           return [...current, { image: compressedBase64, text: "NEW" }];
-        });
-      });
-    });
+    setIsSaving(true);
+    for (const file of filesToProcess) {
+       const url = await uploadToCDN(file, 'home_gallery');
+       if (url) {
+          setLocalGallery(current => {
+             if (current.length >= 8) return current;
+             return [...current, { image: url, text: "NEW" }];
+          });
+       }
+    }
+    setIsSaving(false);
     
-    // reset target so same file can be selected again if needed
     e.target.value = '';
   };
 
@@ -104,8 +120,27 @@ export default function OffersAdmin() {
     setLocalGallery(prev => prev.filter((_, idx) => idx !== index));
   };
 
+  const handleDesignThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: string) => {
+    if(!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setIsSaving(true);
+    const url = await uploadToCDN(file, 'home_customizations');
+    if (url) {
+      setLocalDesignThumbnails(prev => ({ ...prev, [key]: url }));
+    } else {
+      alert(`Failed to upload thumbnail for ${key}`);
+    }
+    setIsSaving(false);
+  };
+
   const toggleCategory = (cat: string) => {
     setLocalCategories(prev => 
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    );
+  };
+
+  const toggleCarousel = (cat: string) => {
+    setLocalCarousels(prev => 
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
     );
   };
@@ -120,11 +155,15 @@ export default function OffersAdmin() {
        eventBanners: localBanners,
        galleryItems: localGallery,
        activeCategories: localCategories,
+       activeCarousels: localCarousels,
+       categorySubtitles: localSubtitles,
+       mobileCategoryImages: localMobileImages,
        isRazorpayEnabled: localRazorpay,
        isAiRecommendationsEnabled: isAiRecommendationsEnabled, 
-       deliveryRates: deliveryRates, 
-       whatsappNumber: whatsappNumber,
-       featuredBentoIds: localFeaturedBento
+       featuredBentoIds: localFeaturedBento,
+       designThumbnails: localDesignThumbnails,
+       upcomingDrops: localUpcomingDrops,
+       deliveryRates: deliveryRates // keep existing global untouched
     };
 
     try {
@@ -140,10 +179,16 @@ export default function OffersAdmin() {
       setIsEventActive(localIsActive);
       setGalleryItems(localGallery);
       setActiveCategories(localCategories);
+      setActiveCarousels(localCarousels);
+      setCategorySubtitles(localSubtitles);
+      setMobileCategoryImages(localMobileImages);
       setIsRazorpayEnabled(localRazorpay);
+      setDeliveryRates(localDeliveryRates);
       setFeaturedBentoIds(localFeaturedBento);
+      setUpcomingDrops(localUpcomingDrops);
       
       alert("Success! Global homepage customized and locked into API seamlessly!");
+      setShowConfirmPopup(false);
     } catch(e) {
       alert("Failed to contact Internal API Server. Reload Required.");
     } finally {
@@ -319,38 +364,39 @@ export default function OffersAdmin() {
 
          </div>
 
-          {/* 3D Scrolling Gallery Configurations */}
+          {/* 3D Animated Posters Gallery */}
           <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden">
-             <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                   <ImageIcon className="w-6 h-6 text-emerald-400" />
-                   <h2 className="text-xl font-bold uppercase tracking-widest text-white">3D Animated Posters</h2>
-                </div>
+             <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+                <ImageIcon className="w-6 h-6 text-emerald-400" />
+                <h2 className="text-xl font-bold uppercase tracking-widest text-white">3D Animated Posters</h2>
              </div>
              <p className="text-sm text-gray-400 uppercase tracking-widest font-bold mb-4">Manage the floating circular gallery displayed on your homepage header.</p>
-             
-             <div className="flex flex-wrap gap-4 mb-6">
+             <div className="flex flex-wrap gap-3 md:gap-4 mb-6">
                 {localGallery.map((item, idx) => (
-                   <div key={idx} className="w-24 border border-white/10 bg-black rounded-xl overflow-hidden relative group">
+                   <div key={idx} className="relative group w-20 md:w-24 border border-white/10 bg-black rounded-xl overflow-hidden shrink-0">
                       <img src={item.image} className="w-full aspect-[3/4] object-cover" />
-                      <button onClick={() => removeGalleryItem(idx)} className="absolute top-1 right-1 bg-red-500 rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <Trash2 className="w-3 h-3 text-white" />
-                      </button>
-                      <input 
-                         type="text" 
-                         value={item.text}
-                         onChange={(e) => {
-                           const newGallery = [...localGallery];
-                           newGallery[idx].text = e.target.value;
-                           setLocalGallery(newGallery);
-                         }}
-                         className="w-full bg-zinc-900 text-[10px] font-bold text-center py-1 outline-none uppercase tracking-widest"
-                      />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                         <button onClick={() => removeGalleryItem(idx)} className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+                            <Trash2 className="w-3 h-3" />
+                         </button>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/80 p-1">
+                         <input 
+                           type="text" 
+                           value={item.text}
+                           onChange={(e) => {
+                             const newGallery = [...localGallery];
+                             newGallery[idx].text = e.target.value;
+                             setLocalGallery(newGallery);
+                           }}
+                           className="w-full bg-zinc-900 text-[8px] md:text-[10px] font-bold text-center py-1 outline-none uppercase tracking-widest"
+                        />
+                      </div>
                    </div>
                 ))}
              </div>
 
-             <div className="w-full h-32 border-2 border-dashed border-white/20 hover:border-emerald-500 transition-colors rounded-2xl flex items-center justify-center cursor-pointer text-gray-500 font-bold uppercase tracking-widest text-sm relative">
+             <div className="w-full h-24 md:h-32 border-2 border-dashed border-white/20 hover:border-emerald-500 transition-colors rounded-2xl flex items-center justify-center cursor-pointer text-gray-500 font-bold uppercase tracking-widest text-xs md:text-sm relative">
                 <input 
                   type="file" 
                   accept="image/*"
@@ -359,31 +405,51 @@ export default function OffersAdmin() {
                   disabled={localGallery.length >= 8}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
                 />
-                + Upload New 3D Animation Graphic
+                <div className="text-center">
+                  <Plus className="w-6 h-6 md:w-8 md:h-8 mb-2" />
+                  <span>+ Upload New 3D Graphic</span>
+                </div>
              </div>
              <p className="text-xs text-gray-500 mt-3 text-center uppercase tracking-widest">Currently displaying {localGallery.length} active 3D posters. Requires 16:9 vertical format.</p>
           </div>
 
           {/* Interactive Categories Manager */}
-          <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden">
+          <div className="bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-8 relative overflow-hidden">
              <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
                 <div className="flex items-center gap-3">
                    <Presentation className="w-6 h-6 text-emerald-400" />
-                   <h2 className="text-xl font-bold uppercase tracking-widest text-white">Interactive Categories & Trending</h2>
+                   <h2 className="text-lg md:text-xl font-bold uppercase tracking-widest text-white">Interactive Categories & Trending</h2>
                 </div>
              </div>
-             <p className="text-sm text-gray-400 uppercase tracking-widest font-bold mb-4">Select which categories appear on the homepage.</p>
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                {Array.from(new Set(products.map(p => p.category))).concat("Shop All").map((cat) => (
-                   <label key={cat} className="flex items-center gap-3 bg-black border border-white/10 p-3 rounded-xl cursor-pointer hover:border-emerald-500/50 transition-colors">
-                      <input 
-                        type="checkbox" 
-                        checked={localCategories.includes(cat)} 
-                        onChange={() => toggleCategory(cat)}
-                        className="accent-emerald-500 w-4 h-4 cursor-pointer" 
-                      />
-                      <span className="text-xs font-bold uppercase tracking-widest text-gray-300">{cat}</span>
-                   </label>
+              <p className="text-sm text-gray-400 uppercase tracking-widest font-bold mb-4">Select which categories appear on the homepage collections menu and as individual carousels.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
+                 {Array.from(new Set(products.map(p => p.category))).concat("Shop All").map((cat) => (
+                    <div key={cat} className="flex flex-col gap-2 p-3 bg-black border border-white/10 rounded-xl">
+                       <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-white/10 pb-2 mb-1">{cat}</h3>
+                       <div className="flex justify-between items-center gap-2">
+                         <label className="flex flex-1 items-center gap-2 cursor-pointer hover:text-emerald-400 transition-colors">
+                            <input 
+                              type="checkbox" 
+                              checked={localCategories.includes(cat)} 
+                              onChange={() => toggleCategory(cat)}
+                              className="accent-emerald-500 w-3 h-3 cursor-pointer flex-shrink-0" 
+                            />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 truncate">Menu Grid</span>
+                         </label>
+                         {cat !== "Shop All" && (
+                           <label className="flex flex-1 items-center gap-2 cursor-pointer hover:text-emerald-400 transition-colors">
+                              <input 
+                                type="checkbox" 
+                                checked={localCarousels.includes(cat)} 
+                                onChange={() => toggleCarousel(cat)}
+                                className="accent-emerald-500 w-3 h-3 cursor-pointer flex-shrink-0" 
+                              />
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 truncate">Carousel</span>
+                           </label>
+                         )}
+                       </div>
+                       {/* Removed photo and caption configurators as requested to keep UI clean and responsive */}
+                   </div>
                 ))}
              </div>
              
@@ -421,12 +487,207 @@ export default function OffersAdmin() {
                 </button>
              </div>
            </div>
+
+           {/* Design Your Own Thumbnails Editor */}
+           <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 md:p-8 relative mt-2">
+             <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+               <ImageIcon className="w-6 h-6 text-purple-400" />
+               <h2 className="text-xl font-bold uppercase tracking-widest text-white">Design Your Own Thumbnails</h2>
+             </div>
+             
+             <p className="text-sm text-gray-400 mb-6">Upload preview thumbnails for the "Design Your Own" section on the homepage.</p>
+             
+             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {[
+                  { key: 'split', title: 'Split Posters' },
+                  { key: 'retro', title: 'Retro Posters' },
+                  { key: 'mini', title: 'Mini Pocket Photos' }
+                ].map((item) => (
+                  <div key={item.key} className="bg-black border border-white/10 rounded-2xl p-4 flex flex-col gap-4">
+                     <div className="text-center border-b border-white/5 pb-3">
+                        <h4 className="text-white font-bold uppercase tracking-widest text-sm">{item.title}</h4>
+                        <p className="text-[10px] text-gray-500 uppercase mt-1 tracking-widest">Base & Hover states</p>
+                     </div>
+                     
+                     <div className="grid grid-cols-3 gap-3">
+                        {/* MOBILE ONLY */}
+                        <div className="group relative">
+                           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider text-center mb-2">Mobile Only</p>
+                           {localDesignThumbnails[`${item.key}_mobile`] || localDesignThumbnails[item.key] ? (
+                              <div className="aspect-[4/5] relative rounded-xl overflow-hidden border border-white/10">
+                                 {/* eslint-disable-next-line @next/next/no-img-element */}
+                                 <img src={localDesignThumbnails[`${item.key}_mobile`] || localDesignThumbnails[item.key]} alt={`${item.title} Mobile`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <label className="cursor-pointer bg-white text-black px-3 py-1.5 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-400 transition-colors">
+                                      Change
+                                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleDesignThumbnailUpload(e, `${item.key}_mobile`)} disabled={isSaving} />
+                                    </label>
+                                 </div>
+                              </div>
+                           ) : (
+                              <label className="aspect-[4/5] relative rounded-xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-colors">
+                                 <Plus className="w-5 h-5 text-gray-600 mb-1" />
+                                 <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest text-center px-2">Upload</span>
+                                 <input type="file" accept="image/*" className="hidden" onChange={(e) => handleDesignThumbnailUpload(e, `${item.key}_mobile`)} disabled={isSaving} />
+                              </label>
+                           )}
+                        </div>
+
+                        {/* DESKTOP BASE */}
+                        <div className="group relative">
+                           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider text-center mb-2">Laptop Base</p>
+                           {localDesignThumbnails[`${item.key}_desktop`] || localDesignThumbnails[item.key] ? (
+                              <div className="aspect-[4/5] relative rounded-xl overflow-hidden border border-white/10">
+                                 {/* eslint-disable-next-line @next/next/no-img-element */}
+                                 <img src={localDesignThumbnails[`${item.key}_desktop`] || localDesignThumbnails[item.key]} alt={`${item.title} Desktop`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <label className="cursor-pointer bg-white text-black px-3 py-1.5 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-400 transition-colors">
+                                      Change
+                                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleDesignThumbnailUpload(e, `${item.key}_desktop`)} disabled={isSaving} />
+                                    </label>
+                                 </div>
+                              </div>
+                           ) : (
+                              <label className="aspect-[4/5] relative rounded-xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-colors">
+                                 <Plus className="w-5 h-5 text-gray-600 mb-1" />
+                                 <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest text-center px-2">Upload</span>
+                                 <input type="file" accept="image/*" className="hidden" onChange={(e) => handleDesignThumbnailUpload(e, `${item.key}_desktop`)} disabled={isSaving} />
+                              </label>
+                           )}
+                        </div>
+
+                        {/* DESKTOP HOVER */}
+                        <div className="group relative">
+                           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider text-center mb-2">Laptop Hover</p>
+                           {localDesignThumbnails[`${item.key}_hover`] ? (
+                              <div className="aspect-[4/5] relative rounded-xl overflow-hidden border border-white/10">
+                                 {/* eslint-disable-next-line @next/next/no-img-element */}
+                                 <img src={localDesignThumbnails[`${item.key}_hover`]} alt={`${item.title} Hover`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <label className="cursor-pointer bg-white text-black px-3 py-1.5 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-400 transition-colors">
+                                      Change
+                                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleDesignThumbnailUpload(e, `${item.key}_hover`)} disabled={isSaving} />
+                                    </label>
+                                 </div>
+                              </div>
+                           ) : (
+                              <label className="aspect-[4/5] relative rounded-xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-colors">
+                                 <Plus className="w-5 h-5 text-gray-600 mb-1" />
+                                 <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest text-center px-2">Upload</span>
+                                 <input type="file" accept="image/*" className="hidden" onChange={(e) => handleDesignThumbnailUpload(e, `${item.key}_hover`)} disabled={isSaving} />
+                              </label>
+                           )}
+                        </div>
+                     </div>
+                  </div>
+                ))}
+             </div>
+           </div>
+           
+           {/* Delivery Shipping Rules Editor completely removed to its dedicated page */}
+
+           {/* Upcoming Drops Editor */}
+           <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 md:p-8 relative mt-2">
+             <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+                <CalendarRange className="w-6 h-6 text-rose-400" />
+                <h2 className="text-xl font-bold uppercase tracking-widest text-white">Upcoming Drops</h2>
+             </div>
+             
+             <p className="text-sm text-gray-400 mb-6 font-bold uppercase tracking-widest">Manage Sneak Peek previews for future releases. Maximum 3 drops.</p>
+             
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[0, 1, 2].map((idx) => {
+                   const drop = localUpcomingDrops[idx] || { image: '', title: '', subtitle: '' };
+                   return (
+                     <div key={idx} className="bg-black border border-white/10 rounded-2xl p-4 flex flex-col gap-4">
+                        <div className="aspect-square relative rounded-xl border border-white/10 overflow-hidden group">
+                           {drop.image ? (
+                              <React.Fragment>
+                                 <img src={drop.image} alt="Preview" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <label className="cursor-pointer bg-white text-black px-3 py-1.5 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-400 transition-colors">
+                                      Change Graphic
+                                      <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                          if(!e.target.files?.length) return;
+                                          setIsSaving(true);
+                                          const url = await uploadToCDN(e.target.files[0], 'home_upcoming');
+                                          if (url) {
+                                            const updated = [...localUpcomingDrops];
+                                            if(!updated[idx]) updated[idx] = { image: '', title: '', subtitle: '' };
+                                            updated[idx].image = url;
+                                            setLocalUpcomingDrops(updated);
+                                          }
+                                          setIsSaving(false);
+                                      }} disabled={isSaving} />
+                                    </label>
+                                 </div>
+                              </React.Fragment>
+                           ) : (
+                              <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors border-2 border-dashed border-white/10 m-2 rounded-lg">
+                                 <Plus className="w-6 h-6 text-gray-600 mb-2" />
+                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Upload Graphic</span>
+                                 <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                     if(!e.target.files?.length) return;
+                                     setIsSaving(true);
+                                     const url = await uploadToCDN(e.target.files[0], 'home_upcoming');
+                                     if (url) {
+                                       const updated = [...localUpcomingDrops];
+                                       updated[idx] = { image: url, title: '', subtitle: '' };
+                                       setLocalUpcomingDrops(updated);
+                                     }
+                                     setIsSaving(false);
+                                 }} disabled={isSaving} />
+                              </label>
+                           )}
+                        </div>
+                        
+                        <div className="flex flex-col gap-3">
+                           <input 
+                             type="text" 
+                             placeholder="DROP TITLE (e.g. CYBERPUNK)" 
+                             value={drop.title}
+                             onChange={(e) => {
+                                const updated = [...localUpcomingDrops];
+                                if(!updated[idx]) updated[idx] = { image: '', title: '', subtitle: '' };
+                                updated[idx].title = e.target.value;
+                                setLocalUpcomingDrops(updated);
+                             }}
+                             className="w-full bg-zinc-900 border border-white/10 rounded px-3 py-2 text-xs text-white uppercase tracking-widest font-bold outline-none focus:border-emerald-500 transition-colors placeholder:text-zinc-700"
+                           />
+                           <input 
+                             type="text" 
+                             placeholder="SUBTITLE (e.g. COMING SOON)" 
+                             value={drop.subtitle}
+                             onChange={(e) => {
+                                const updated = [...localUpcomingDrops];
+                                if(!updated[idx]) updated[idx] = { image: '', title: '', subtitle: '' };
+                                updated[idx].subtitle = e.target.value;
+                                setLocalUpcomingDrops(updated);
+                             }}
+                             className="w-full bg-zinc-900 border border-white/10 rounded px-3 py-2 text-xs text-rose-400 uppercase tracking-widest font-bold outline-none focus:border-rose-500 transition-colors placeholder:text-zinc-700"
+                           />
+                           <button 
+                             onClick={() => {
+                                const updated = [...localUpcomingDrops];
+                                updated.splice(idx, 1);
+                                setLocalUpcomingDrops(updated);
+                             }}
+                             className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors self-start mt-1"
+                           >
+                             Remove Drop
+                           </button>
+                        </div>
+                     </div>
+                   );
+                })}
+             </div>
+           </div>
            
       </div>
       {/* Floating Action Menu */}
       <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
          <button 
-           onClick={handleSave}
+           onClick={() => setShowConfirmPopup(true)}
            disabled={isSaving}
            className={`bg-emerald-500 hover:bg-emerald-400 text-black px-6 md:px-8 py-4 rounded-full font-black uppercase tracking-widest flex items-center gap-2 shadow-[0_10px_30px_rgba(16,185,129,0.3)] transition-all transform hover:-translate-y-1 ${isSaving ? 'opacity-80 scale-95 pointer-events-none' : ''}`}
          >
@@ -434,6 +695,26 @@ export default function OffersAdmin() {
             {isSaving ? 'Pushing Live...' : 'Save & Publish Global Events'}
          </button>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+           <div className="bg-zinc-900 border border-emerald-500/30 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-[0_0_50px_rgba(16,185,129,0.15)] animate-in zoom-in-95 duration-200 text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full mix-blend-screen pointer-events-none" />
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h3 className="text-2xl font-outfit font-black uppercase tracking-widest text-white mb-3">Confirm Changes</h3>
+              <p className="text-sm text-gray-400 mb-8 leading-relaxed">Are you absolutely sure you want to push these settings globally? This will override current configurations and affect the live storefront immediately.</p>
+              <div className="flex gap-4">
+                 <button onClick={() => setShowConfirmPopup(false)} className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-xl py-3.5 font-bold uppercase tracking-widest text-xs transition-colors border border-white/10 hover:border-white/20">Cancel</button>
+                 <button onClick={handleSave} disabled={isSaving} className="flex-1 bg-emerald-500 hover:bg-emerald-400 border border-emerald-400 text-black rounded-xl py-3.5 font-bold uppercase tracking-widest text-xs transition-colors shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                   {isSaving ? 'Processing...' : 'Confirm & Push'}
+                 </button>
+              </div>
+           </div>
+        </div>
+      )}
 
     </div>
   );

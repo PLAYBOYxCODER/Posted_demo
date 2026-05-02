@@ -2,7 +2,7 @@
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import { Children, cloneElement, useEffect, useMemo, useRef, useState } from 'react';
 import { Search, Heart, User, Settings, ShoppingCart, Grid, Home } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 // Dock Sub-Components internal logic
 function DockItem({ children, className = '', onClick, mouseX, spring, distance, magnification, baseItemSize }: any) {
@@ -135,6 +135,11 @@ function Dock({
 // Master component exported for absolute structural layout usage
 export default function MobileDock() {
   const router = useRouter();
+  const pathname = usePathname();
+  
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
   
   const items = [
     { icon: <Home size={22} />, label: 'Home', onClick: () => router.push('/') },

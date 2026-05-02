@@ -12,7 +12,7 @@ export default function ProfilePage() {
   const { orders } = useOrders();
   const { user, profile, isLoading, signOut, uploadAvatar, updateProfile } = useAuth();
 
-  const [activeTab, setActiveTab] = useState("orders"); // orders, details
+  const [activeTab, setActiveTab] = useState("details"); // orders, details
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -195,8 +195,8 @@ export default function ProfilePage() {
              {/* Navigation Nav */}
              <div className="bg-zinc-900 border border-white/10 rounded-3xl p-4 space-y-2">
                 <button 
-                  onClick={() => setActiveTab("orders")}
-                  className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-all ${activeTab === 'orders' ? 'bg-white text-black' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                  onClick={() => router.push('/orders')}
+                  className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-all"
                 >
                   <Package className="w-5 h-5" /> Order History
                 </button>

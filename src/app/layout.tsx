@@ -28,7 +28,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${outfit.variable} antialiased bg-black text-white min-h-screen`}>
+      <body className={`${inter.variable} ${outfit.variable} antialiased bg-black text-white min-h-screen relative`}>
+        <div className="noise-bg" />
         <ClickSpark
           sparkColor="#ffffff"
           sparkSize={8}

@@ -40,7 +40,7 @@ export default function AdminLayout({
     { name: "Custom Orders", href: "/admin/custom-orders", icon: Wand2 },
     { name: "Tracking", href: "/admin/tracking", icon: Navigation },
     { name: "Order History", href: "/admin/order-history", icon: Archive },
-    { name: "Delivery Rules", href: "/admin/delivery-charges", icon: Package },
+    { name: "Delivery Rules", href: "/admin/delivery-rules", icon: Package },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Home Customization", href: "/admin/home", icon: Sparkles },
     { name: "Verified Posts", href: "/admin/verified", icon: Camera },

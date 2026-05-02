@@ -105,14 +105,14 @@ function ReceiptContent() {
                 <span class="value">₹${item.price * item.quantity}</span>
               </div>
             `).join('') || `
-              <div class="item-row"><div><p class="item-name">The Marvel Masterpiece Vol. 1</p></div><span class="value">₹799</span></div>
+              <div class="item-row"><div><p class="item-name">Pending Items...</p></div><span class="value">₹0</span></div>
             `}
           </div>
 
           <div class="totals">
             <div class="total-row">
               <span class="label">Subtotal</span>
-              <span class="value">₹${actualOrder?.total || 799}</span>
+              <span class="value">₹${actualOrder?.total || 0}</span>
             </div>
             <div class="total-row">
               <span class="label">Shipping</span>
@@ -120,7 +120,7 @@ function ReceiptContent() {
             </div>
             <div class="total-row grand-total">
               <span style="text-transform: uppercase; font-size: 14px; color: #71717a; letter-spacing: 1px;">Amount Due</span>
-              <span>₹${actualOrder?.total || 799}</span>
+              <span>₹${actualOrder?.total || 0}</span>
             </div>
           </div>
 

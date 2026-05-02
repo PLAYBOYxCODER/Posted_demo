@@ -19,16 +19,19 @@ export default function Header() {
 
   const { products } = useProducts();
   
-  // Dynamically map ONLY Admin-activated categories to the Global Header Nav
+  // Dynamically map ONLY categories that actually contain products inside the Database
   const categoryMap = new Map<string, Set<string>>();
-  activeCategories.forEach(cat => {
-    if (cat === "Shop All") return; // Handled as explicit menu item often
-    categoryMap.set(cat, new Set());
-    products.forEach(p => {
-       if (p.category === cat && p.subCategory) {
-          categoryMap.get(cat)!.add(p.subCategory);
-       }
-    });
+  
+  products.forEach(p => {
+     if (!p.category || p.category.toLowerCase() === 'uncategorized') return;
+     
+     if (!categoryMap.has(p.category)) {
+        categoryMap.set(p.category, new Set());
+     }
+     
+     if (p.subCategory) {
+        categoryMap.get(p.category)!.add(p.subCategory);
+     }
   });
 
   const dynamicCategories = Array.from(categoryMap.entries()).map(([cat, subs]) => ({
@@ -62,7 +65,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto w-full">
           
           {/* MOBILE VIEW (< md) */}
-          <div className="flex md:hidden flex-row items-center justify-between px-4 h-20 relative w-full border-b border-white/5 bg-black/50 backdrop-blur-lg">
+          <div className="flex md:hidden flex-row items-center justify-between px-4 h-[110px] relative w-full border-b border-white/5 bg-black/50">
             
             <div className="flex items-center z-20">
                {/* @ts-ignore */}
@@ -137,43 +140,45 @@ export default function Header() {
                 <nav className="flex items-center gap-6 relative">
                   <Link href="/shop" className="text-gray-300 hover:text-white transition-colors uppercase font-outfit font-bold tracking-widest text-sm">Shop All</Link>
                   
-                  {/* Categories Dropdown */}
-                  <div className="group relative">
-                    <button className="text-gray-300 group-hover:text-white transition-colors uppercase font-outfit font-bold tracking-widest text-sm py-2">
-                       Categories
-                    </button>
-                    {/* The Dropdown Menu */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-zinc-950 border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 flex flex-col py-4 z-50">
-                        <div className="absolute -top-2 left-0 w-full h-4 bg-transparent" /> {/* hover bridge */}
-                        {Array.from(categoryMap.entries()).map(([cat, subs]) => (
-                          <div key={cat} className="group/sub relative">
-                            <Link 
-                              href={`/shop?cat=${cat.toLowerCase()}`} 
-                              className="px-6 py-2 text-[11px] font-outfit font-black uppercase tracking-widest text-gray-400 hover:text-emerald-400 hover:bg-white/5 transition-colors flex items-center justify-between"
-                            >
-                              {cat}
-                              {subs.size > 0 && <span className="ml-2">▸</span>}
-                            </Link>
-                            
-                            {/* Hover Sub-menu for Desktop */}
-                            {subs.size > 0 && (
-                               <div className="absolute top-0 left-full ml-0 w-48 bg-zinc-950 border border-emerald-500/20 rounded-lg shadow-2xl opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-200 flex flex-col py-2 z-50">
-                                  <div className="absolute top-0 -left-2 w-2 h-full bg-transparent" />
-                                  {Array.from(subs).map(sub => (
-                                     <Link 
-                                       key={sub} 
-                                       href={`/shop?cat=${encodeURIComponent(cat.toLowerCase())}&sub=${encodeURIComponent(sub.toLowerCase())}`} 
-                                       className="px-6 py-2 text-[10px] font-outfit font-black uppercase tracking-widest text-gray-500 hover:text-emerald-400 hover:bg-white/5 transition-colors"
-                                     >
-                                       {sub}
-                                     </Link>
-                                  ))}
-                               </div>
-                            )}
-                          </div>
-                        ))}
+                  {/* Categories Dropdown (Only show if real categories exist in DB) */}
+                  {categoryMap.size > 0 && (
+                    <div className="group relative">
+                      <button className="text-gray-300 group-hover:text-white transition-colors uppercase font-outfit font-bold tracking-widest text-sm py-2">
+                         Categories
+                      </button>
+                      {/* The Dropdown Menu */}
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-zinc-950 border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 flex flex-col py-4 z-50">
+                          <div className="absolute -top-2 left-0 w-full h-4 bg-transparent" /> {/* hover bridge */}
+                          {Array.from(categoryMap.entries()).map(([cat, subs]) => (
+                            <div key={cat} className="group/sub relative">
+                              <Link 
+                                href={`/shop?cat=${cat.toLowerCase()}`} 
+                                className="px-6 py-2 text-[11px] font-outfit font-black uppercase tracking-widest text-gray-400 hover:text-emerald-400 hover:bg-white/5 transition-colors flex items-center justify-between"
+                              >
+                                {cat}
+                                {subs.size > 0 && <span className="ml-2">▸</span>}
+                              </Link>
+                              
+                              {/* Hover Sub-menu for Desktop */}
+                              {subs.size > 0 && (
+                                 <div className="absolute top-0 left-full ml-0 w-48 bg-zinc-950 border border-emerald-500/20 rounded-lg shadow-2xl opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-200 flex flex-col py-2 z-50">
+                                    <div className="absolute top-0 -left-2 w-2 h-full bg-transparent" />
+                                    {Array.from(subs).map(sub => (
+                                       <Link 
+                                         key={sub} 
+                                         href={`/shop?cat=${encodeURIComponent(cat.toLowerCase())}&sub=${encodeURIComponent(sub.toLowerCase())}`} 
+                                         className="px-6 py-2 text-[10px] font-outfit font-black uppercase tracking-widest text-gray-500 hover:text-emerald-400 hover:bg-white/5 transition-colors"
+                                       >
+                                         {sub}
+                                       </Link>
+                                    ))}
+                                 </div>
+                              )}
+                            </div>
+                          ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <Link href="/design" className="text-gray-300 hover:text-white transition-colors uppercase font-outfit font-bold tracking-widest text-sm border border-white/20 px-4 py-2 rounded-full hover:bg-white/10">Make Your Own</Link>
                 </nav>
@@ -248,7 +253,7 @@ export default function Header() {
       </header>
       
       {/* Spacer to prevent content overlap */}
-      <div className="h-[148px] md:h-[160px]" />
+      <div className="h-[178px] md:h-[160px]" />
 
       {/* MOBILE FULL-SCREEN SLIDING MENU (Removed, now handled by StaggeredMenu) */}
     </>
