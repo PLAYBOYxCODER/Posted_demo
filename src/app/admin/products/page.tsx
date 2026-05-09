@@ -34,6 +34,7 @@ export default function ProductsPage() {
   const [isNewSubCategory, setIsNewSubCategory] = useState(false);
   const [actualPrice, setActualPrice] = useState("");
   const [sellingPrice, setSellingPrice] = useState("");
+  const [meeshoLink, setMeeshoLink] = useState("");
   const [imageBase64Array, setImageBase64Array] = useState<string[]>([]);
   
   const actual = parseFloat(actualPrice);
@@ -83,7 +84,8 @@ export default function ProductsPage() {
              subCategory,
              actualPrice: parseFloat(actualPrice),
              price: parseFloat(sellingPrice),
-             images: imageBase64Array
+             images: imageBase64Array,
+             meesho_link: meeshoLink
            });
          } else {
            await addProduct({
@@ -92,7 +94,8 @@ export default function ProductsPage() {
              subCategory,
              actualPrice: parseFloat(actualPrice),
              price: parseFloat(sellingPrice),
-             images: imageBase64Array
+             images: imageBase64Array,
+             meesho_link: meeshoLink
            });
          }
          
@@ -105,6 +108,7 @@ export default function ProductsPage() {
              setSubCategory("");
              setActualPrice("");
              setSellingPrice("");
+             setMeeshoLink("");
              setImageBase64Array([]);
              setIsAddModalOpen(false);
              setIsSaving(false);
@@ -144,6 +148,7 @@ export default function ProductsPage() {
                 setSubCategory("");
                 setActualPrice("");
                 setSellingPrice("");
+                setMeeshoLink("");
                 setImageBase64Array([]);
                 setIsAddModalOpen(true);
               }}
@@ -189,6 +194,7 @@ export default function ProductsPage() {
                              setSubCategory(product.subCategory || "");
                              setActualPrice(product.actualPrice.toString());
                              setSellingPrice(product.price.toString());
+                             setMeeshoLink(product.meesho_link || "");
                              setImageBase64Array([...product.images]);
                              setIsAddModalOpen(true);
                           }} 
@@ -368,6 +374,17 @@ export default function ProductsPage() {
                         className="w-full bg-black/40 border border-emerald-500/50 rounded-xl px-4 py-2.5 text-emerald-400 placeholder-emerald-900/50 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono font-black shadow-[0_0_15px_rgba(16,185,129,0.1)] backdrop-blur-sm" 
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-white drop-shadow-md">Meesho App Link (Optional)</label>
+                    <input 
+                      type="text" 
+                      value={meeshoLink}
+                      onChange={(e) => setMeeshoLink(e.target.value)}
+                      placeholder="https://www.meesho.com/s/..." 
+                      className="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all font-medium backdrop-blur-sm shadow-inner" 
+                    />
                   </div>
 
                   <div className="space-y-3 pt-2">

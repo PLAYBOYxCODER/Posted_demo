@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { ShoppingBag, Lock, CreditCard, Banknote, ShieldCheck } from "lucide-react";
+import { ShoppingBag, Lock, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import { useOrders } from "@/components/OrderProvider";
@@ -13,10 +13,9 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, total, clearCart } = useCart();
   const { addOrder } = useOrders();
-  const { isRazorpayEnabled, deliveryRates } = useOffers();
+  const { deliveryRates } = useOffers();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processingStage, setProcessingStage] = useState<"speeding" | "gateway" | "truck">("speeding");
-  const [selectedMethod, setSelectedMethod] = useState("");
+  const [processingStage, setProcessingStage] = useState<"speeding" | "truck">("speeding");
   const [shippingState, setShippingState] = useState("");
   const { profile } = useAuth();
 
@@ -42,7 +41,7 @@ export default function CheckoutPage() {
     const city = formData.get("city") as string;
     const state = formData.get("state") as string;
     const pincode = formData.get("pincode") as string;
-    const payment = formData.get("payment") as string;
+    const payment = "Custom Order";
 
     const fullAddress = `${address}, ${city}, ${state} - ${pincode}`;
     
@@ -88,12 +87,12 @@ export default function CheckoutPage() {
            <div className="fixed inset-0 z-[1000] bg-black flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
               {processingStage === "speeding" ? (
                  <>
-                    <h2 className="text-2xl font-black text-white uppercase tracking-widest mb-12 animate-pulse">Contacting Secure Gateway...</h2>
+                    <h2 className="text-2xl font-black text-white uppercase tracking-widest mb-12 animate-pulse">Securing Order Details...</h2>
                     <SpeedingLoader />
                  </>
               ) : (
                  <>
-                    <h2 className="text-2xl font-black text-emerald-400 uppercase tracking-widest mb-12">Payment Secured! Preparing Order...</h2>
+                    <h2 className="text-2xl font-black text-emerald-400 uppercase tracking-widest mb-12">Order Secured! Preparing Delivery...</h2>
                     <DeliveryTruckLoader />
                  </>
               )}
@@ -166,39 +165,7 @@ export default function CheckoutPage() {
                </div>
             </div>
 
-            {/* Payment Method */}
-            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-5 md:p-8">
-               <h2 className="font-outfit text-base md:text-lg font-bold uppercase tracking-widest mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
-                  <span className="bg-white text-black w-6 h-6 flex items-center justify-center rounded-full text-xs">3</span>
-                  Payment Method
-               </h2>
-               <div className="space-y-4">
-                 {isRazorpayEnabled && (
-                   <label className={`flex items-center gap-4 border p-4 rounded-xl cursor-pointer transition-all ${selectedMethod === 'Razorpay' ? 'border-emerald-500 bg-emerald-500/5' : 'border-white/20 hover:bg-white/5'}`}>
-                     <input required type="radio" name="payment" className="w-5 h-5 accent-emerald-500" value="Razorpay" onChange={() => setSelectedMethod("Razorpay")} />
-                     <div className="flex flex-col">
-                       <span className="font-bold uppercase tracking-widest text-sm text-white">Online Payment (Razorpay)</span>
-                       <span className="text-xs text-emerald-400 font-bold uppercase tracking-widest mt-0.5">UPI, Cards, Wallets</span>
-                     </div>
-                     <CreditCard className="w-5 h-5 ml-auto text-emerald-500/50" />
-                   </label>
-                 )}
-                 <label className={`flex items-start gap-4 border p-4 rounded-xl cursor-pointer transition-all ${selectedMethod === 'COD' ? 'border-yellow-500 bg-yellow-500/5' : 'border-white/20 hover:bg-white/5'}`}>
-                   <input required type="radio" name="payment" className="w-5 h-5 accent-emerald-500 mt-1" value="COD" onChange={() => setSelectedMethod("COD")} />
-                   <div className="flex flex-col flex-1">
-                     <span className="font-bold uppercase tracking-widest text-xs sm:text-sm text-white">Cash on Delivery (+₹50 Advance)</span>
-                     <span className="text-[10px] sm:text-xs text-gray-400 mt-0.5 mb-2">Pay the balance when your order arrives</span>
-                     
-                     {selectedMethod === "COD" && (
-                         <div className="text-[9px] sm:text-[10px] text-yellow-500 font-bold tracking-widest p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-                            REQUIRED: A strict ₹50 advance is required now to confirm a COD order. The remaining balance (₹{grandTotal - 50}) will be collected securely at your doorstep.
-                         </div>
-                     )}
-                   </div>
-                   <Banknote className="w-5 h-5 ml-auto text-yellow-500/50" />
-                 </label>
-               </div>
-            </div>
+            {/* Payment section removed per client request */}
           </div>
 
           {/* Checkout Right Summary Panel */}
@@ -249,9 +216,7 @@ export default function CheckoutPage() {
                     <span className="animate-pulse">Processing... Do Not Close</span>
                   ) : (
                     <>
-                      {selectedMethod === "COD" 
-                         ? `Pay ₹50 Advance Now` 
-                         : `Pay ₹${grandTotal} Now`}
+                      Place Order
                       <Lock className="w-4 h-4" />
                     </>
                   )}
@@ -260,7 +225,7 @@ export default function CheckoutPage() {
                 <div className="mt-6 flex items-start gap-3 bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/20">
                   <ShieldCheck className="w-8 h-8 text-emerald-500 shrink-0" />
                   <p className="text-xs text-gray-400 leading-relaxed uppercase tracking-widest">
-                    Your payment details are fully encrypted and secure. By placing your order, you agree to our Terms of Service.
+                    Your details are fully encrypted and secure. By placing your order, you agree to our Terms of Service.
                   </p>
                 </div>
              </div>

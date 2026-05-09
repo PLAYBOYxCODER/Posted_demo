@@ -90,12 +90,23 @@ export default function WishlistPage() {
                            <p className="text-[9px] md:text-[11px] text-gray-500 italic uppercase tracking-widest">
                              &quot;{quote}&quot;
                            </p>
-                           <button 
-                             onClick={() => handleAddToCart(item)}
-                             className="w-full sm:w-auto bg-white hover:bg-emerald-400 hover:text-black text-black px-4 md:px-6 py-2 md:py-3 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] shrink-0"
-                           >
-                              Add to Cart <ShoppingCart className="w-3 h-3 md:w-4 md:h-4 ml-1" />
-                           </button>
+                           {item.meesho_link ? (
+                             <a 
+                               href={item.meesho_link} 
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-black px-4 md:px-6 py-2 md:py-3 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] shrink-0"
+                             >
+                                Buy on Meesho <ShoppingCart className="w-3 h-3 md:w-4 md:h-4 ml-1" />
+                             </a>
+                           ) : (
+                             <button 
+                               onClick={() => handleAddToCart(item)}
+                               className="w-full sm:w-auto bg-white hover:bg-emerald-400 hover:text-black text-black px-4 md:px-6 py-2 md:py-3 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] shrink-0"
+                             >
+                                Add to Cart <ShoppingCart className="w-3 h-3 md:w-4 md:h-4 ml-1" />
+                             </button>
+                           )}
                         </div>
                      </div>
                   </div>

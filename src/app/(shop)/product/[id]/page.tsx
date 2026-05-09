@@ -164,9 +164,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
              </div>
 
              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-10">
-                <button onClick={handleAddToCart} className="flex-1 bg-white text-black py-4 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-gray-200 transition-colors flex items-center justify-center gap-3 h-14 md:h-16 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                  <ShoppingCart className="w-5 h-5" /> Add to Cart — ₹{product?.price || 499}
-                </button>
+                {product?.meesho_link ? (
+                  <a href={product.meesho_link} target="_blank" rel="noopener noreferrer" className="flex-1 bg-emerald-500 text-black py-4 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-emerald-400 transition-colors flex items-center justify-center gap-3 h-14 md:h-16 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                    <ShoppingCart className="w-5 h-5" /> Buy on Meesho
+                  </a>
+                ) : (
+                  <button onClick={handleAddToCart} className="flex-1 bg-white text-black py-4 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-gray-200 transition-colors flex items-center justify-center gap-3 h-14 md:h-16 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    <ShoppingCart className="w-5 h-5" /> Add to Cart — ₹{product?.price || 499}
+                  </button>
+                )}
                 <button 
                   onClick={handleToggleWishlist} 
                   className={`py-4 px-6 md:px-8 rounded-xl font-bold uppercase tracking-widest text-sm border-2 transition-all flex items-center justify-center gap-2 h-14 md:h-16 shrink-0 ${isWishlisted ? 'bg-red-500/10 border-red-500 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-white/20 text-white hover:border-white/50'}`}

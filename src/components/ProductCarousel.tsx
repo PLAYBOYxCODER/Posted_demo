@@ -109,23 +109,35 @@ export default function ProductCarousel({ title, subtitle, products, viewAllLink
              </div>
              
              <div className="absolute top-4 right-4 md:top-6 md:right-6 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300 z-10">
-               <button 
-                 onClick={(e) => {
-                    e.preventDefault();
-                    addToCart({
-                       id: product.id,
-                       name: product.name,
-                       price: product.price,
-                       image: product.images && product.images.length > 0 ? product.images[0] : "",
-                       size: "12x18 inches",
-                       quantity: 1
-                    });
-                 }}
-                 className="bg-white text-black p-3 md:p-4 rounded-full shadow-2xl hover:bg-emerald-400 transition-colors"
-                 title="Quick Add to Cart"
-               >
-                 <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
-               </button>
+               {product.meesho_link ? (
+                 <a 
+                   href={product.meesho_link} 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   className="bg-emerald-500 text-black p-3 md:p-4 rounded-full shadow-2xl hover:bg-emerald-400 transition-colors flex items-center justify-center"
+                   title="Buy on Meesho"
+                 >
+                   <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+                 </a>
+               ) : (
+                 <button 
+                   onClick={(e) => {
+                      e.preventDefault();
+                      addToCart({
+                         id: product.id,
+                         name: product.name,
+                         price: product.price,
+                         image: product.images && product.images.length > 0 ? product.images[0] : "",
+                         size: "12x18 inches",
+                         quantity: 1
+                      });
+                   }}
+                   className="bg-white text-black p-3 md:p-4 rounded-full shadow-2xl hover:bg-emerald-400 transition-colors"
+                   title="Quick Add to Cart"
+                 >
+                   <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+                 </button>
+               )}
              </div>
            </div>
         ))}

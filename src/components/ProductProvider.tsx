@@ -15,6 +15,7 @@ export type ProductModel = {
   rating?: number;
   description?: string;
   created_at?: string;
+  meesho_link?: string;
 };
 
 type ProductContextType = {
@@ -91,6 +92,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
         sub_category: product.subCategory || null,
         images: product.images,
         description: product.description || "",
+        meesho_link: product.meesho_link || null,
       };
       
       const { data, error } = await supabase.from('products').insert([supabasePayload]).select().single();
@@ -107,6 +109,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     try {
       const supabasePayload: any = { ...updates };
       if (updates.actualPrice) supabasePayload.discount_price = updates.actualPrice;
+      if (updates.meesho_link !== undefined) supabasePayload.meesho_link = updates.meesho_link;
       
       const { error } = await supabase.from('products').update(supabasePayload).eq('id', id);
       if (error) throw error;
