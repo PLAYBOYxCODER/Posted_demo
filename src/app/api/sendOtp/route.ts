@@ -38,9 +38,9 @@ export async function POST(request: Request) {
     }
 
     // Step 4: Send via Resend
-    // USING onboarding@resend.dev IS MANDATORY for unverified domains during testing!
+    const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
     const { data: resendData, error: resendError } = await resend.emails.send({
-      from: 'Acme <onboarding@resend.dev>', // Free tier verified testing sender
+      from: `Posted <${fromEmail}>`,
       to: [email.trim().toLowerCase()],
       subject: "Your Access OTP Code",
       html: `
